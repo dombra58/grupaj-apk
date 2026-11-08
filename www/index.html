@@ -76,6 +76,7 @@ body{background:#f4f7f6;color:#1e293b;font-family:'Inter',sans-serif;margin:0;pa
     <div id="ilan-listesi"></div>
 </div>
 <script>
+const SUNUCU = 'http://169.40.43.91';
 let harita={},havuz=[],secili=[],aktif=[],ilanlar=[];
 let kayitliTel=localStorage.getItem('grupaj_sofor_tel')||'',kontrolSayaci=null;
 const tr=s=>s.replace(/i/g,'İ').replace(/ı/g,'I').toUpperCase();
@@ -96,112 +97,26 @@ async function sifreIste(){
     document.getElementById('sifreBtn').innerText='Bağlantı Hazırlanıyor...';
     document.getElementById('sifreKutusu').style.display='block';
 
-    const res=await fetch('/api/sifre-al',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({telefon:ham})});
-    const veri=await res.json();
-    if(veri.durum==='bagli'){localStorage.setItem('grupaj_sofor_tel',veri.telefon);radariAc(veri.telefon);return;}
+    try {
+        const res=await fetch(SUNUCU+'/api/sifre-al',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({telefon:ham})});
+        const veri=await res.json();
+        if(veri.durum==='bagli'){localStorage.setItem('grupaj_sofor_tel',veri.telefon);radariAc(veri.telefon);return;}
 
-    if(kontrolSayaci)clearInterval(kontrolSayaci);
-    kontrolSayaci=setInterval(async()=>{
-        const d=await(await fetch('/api/durum/'+veri.telefon)).json();
-        if(d.bagli){clearInterval(kontrolSayaci);localStorage.setItem('grupaj_sofor_tel',veri.telefon);radariAc(veri.telefon);}
-        else if(d.kod){
-            document.getElementById('durumYazi').innerText='✅ Sabit Eşleşme Şifreniz Hazır:';
-            document.getElementById('sifreKodu').innerText=d.kod;
-            document.getElementById('kopyalaBtn').style.display='inline-block';
-        }
-    },2000);
-}
-
-function koduKopyala(){
-    navigator.clipboard.writeText(document.getElementById('sifreKodu').innerText);
-    document.getElementById('kopyalaBtn').innerText='✅ Kopyalandı!';
-}
-
-function radariAc(tel){
-    kayitliTel=tel;
-    document.getElementById('girisEkrani').style.display='none';
-    document.getElementById('radarEkrani').style.display='block';
-    cek();setInterval(cek,2000);
-}
-
-const inp=document.getElementById('aramaInput'),lst=document.getElementById('acilirListe');
-inp.addEventListener('input',()=>{
-    const v=tr(inp.value.trim());lst.innerHTML='';
-    if(v.length<3){lst.style.display='none';return;}
-    const bul=havuz.filter(y=>y.ad.startsWith(v)||y.ad.includes(v)).slice(0,15);
-    if(!bul.length){lst.style.display='none';return;}
-    bul.forEach(y=>{
-        const d=document.createElement('div');d.className='liste-eleman';
-        d.innerHTML=`<span>${y.ad}</span><span style="font-size:11px;opacity:.7">${y.tur}</span>`;
-        d.onclick=()=>{if(!secili.some(s=>s.ad===y.ad&&s.tur===y.tur))secili.push(y);inp.value='';lst.style.display='none';etiketCiz();};
-        lst.appendChild(d);
-    });lst.style.display='block';
-});
-function etiketCiz(){document.getElementById('seciliEtiketler').innerHTML=secili.map((y,i)=>`<div class="secili-etiket"><span onclick="secili.splice(${i},1);etiketCiz()">×</span> ${y.ad}</div>`).join('');}
-function aramayiUygula(){
-    let h=[];
-    secili.forEach(s=>{h.push(s.ad.startsWith('İSTANBUL')?'İSTANBUL':s.ad);if(s.tur==='İl'&&harita[s.ad])h.push(...harita[s.ad]);});
-    const yazilan=tr(inp.value.trim());if(yazilan.length>=2)h.push(yazilan);
-    aktif=[...new Set(h)].sort((a,b)=>b.length-a.length);ekranaBas();
-}
-document.addEventListener('click',e=>{if(!e.target.closest('.kutu-dis'))lst.style.display='none';});
-async function cek(){if(!kayitliTel)return;try{ilanlar=await(await fetch('/api/ilanlar/'+kayitliTel)).json();ekranaBas();}catch(e){}}
-function ekranaBas(){
-    const k=document.getElementById('ilan-listesi');
-    const f=ilanlar.filter(i=>!aktif.length||aktif.some(x=>tr(i.mesaj||'').includes(x)));
-    if(!f.length){k.innerHTML='<div style="text-align:center;color:#64748b;margin-top:25px">Eşleşen ilan bulunamadı...</div>';return;}
-    k.innerHTML=f.map(i=>{
-        const tel=i.telefon?String(i.telefon).replace(/\D/g,''):'';
-        const d=i.tarih?new Date(i.tarih):new Date();
-        const z=`${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-        const ik=i.tip==='Kanal'?'📢':(i.tip==='Durum'?'📱':'👥');
-        let m=i.mesaj||'';
-        if(aktif.length){
-            const bm=tr(m);let s='',idx=0;
-            while(idx<m.length){
-                let e=aktif.find(x=>bm.startsWith(x,idx));
-                if(e){s+=`<span class="kirmizi-dolgu">${m.substr(idx,e.length)}</span>`;idx+=e.length;}else{s+=m[idx];idx++;}
-            }m=s;
-        }
-        return `<div class="ilan-kart"><div class="ilan-ust"><span class="tip-rozet">${ik} ${i.tip} : ${i.kaynak}</span><span class="tarih-saat">📅 ${z}</span></div><div class="mesaj">${m}</div>${tel.length>=10?`<div class="aksiyon"><a href="tel:+${tel}" class="btn-ara">📞 Hemen Ara</a><a href="https://wa.me{tel}" target="_blank" class="btn-wp">💬 WhatsApp'tan Yaz</a></div>`:''}</div>`;
-    }).join('');
-}
-<script>
-const SUNUCU = 'http://169.40.43.91:5000';
-let harita={},havuz=[],secili=[],aktif=[],ilanlar=[];
-let kayitliTel=localStorage.getItem('grupaj_sofor_tel')||'',kontrolSayaci=null;
-const tr=s=>s.replace(/i/g,'İ').replace(/ı/g,'I').toUpperCase();
-
-fetch('/iller.json').then(r=>r.json()).then(res=>{
-    res.data.forEach(il=>{
-        const ad=tr(il.name),ilc=(il.districts||[]).map(d=>tr(d.name)).filter(d=>d!=='MERKEZ');
-        harita[ad]=ilc;havuz.push({ad,tur:'İl'});ilc.forEach(x=>havuz.push({ad:x,tur:ad+' İlçesi'}));
-    });
-});
-
-if(kayitliTel)radariAc(kayitliTel);
-
-async function sifreIste(){
-    const ham=document.getElementById('telInput').value.replace(/\D/g,'');
-    if(ham.length<10){alert('Lütfen geçerli bir cep telefonu numarası girin.');return;}
-    document.getElementById('sifreBtn').disabled=true;
-    document.getElementById('sifreBtn').innerText='Bağlantı Hazırlanıyor...';
-    document.getElementById('sifreKutusu').style.display='block';
-
-    const res=await fetch(SUNUCU+'/api/sifre-al',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({telefon:ham})});
-    const veri=await res.json();
-    if(veri.durum==='bagli'){localStorage.setItem('grupaj_sofor_tel',veri.telefon);radariAc(veri.telefon);return;}
-
-    if(kontrolSayaci)clearInterval(kontrolSayaci);
-    kontrolSayaci=setInterval(async()=>{
-        const d=await(await fetch(SUNUCU+'/api/durum/'+veri.telefon)).json();
-        if(d.bagli){clearInterval(kontrolSayaci);localStorage.setItem('grupaj_sofor_tel',veri.telefon);radariAc(veri.telefon);}
-        else if(d.kod){
-            document.getElementById('durumYazi').innerText='✅ Sabit Eşleşme Şifreniz Hazır:';
-            document.getElementById('sifreKodu').innerText=d.kod;
-            document.getElementById('kopyalaBtn').style.display='inline-block';
-        }
-    },2000);
+        if(kontrolSayaci)clearInterval(kontrolSayaci);
+        kontrolSayaci=setInterval(async()=>{
+            const d=await(await fetch(SUNUCU+'/api/durum/'+veri.telefon)).json();
+            if(d.bagli){clearInterval(kontrolSayaci);localStorage.setItem('grupaj_sofor_tel',veri.telefon);radariAc(veri.telefon);}
+            else if(d.kod){
+                document.getElementById('durumYazi').innerText='✅ Sabit Eşleşme Şifreniz Hazır:';
+                document.getElementById('sifreKodu').innerText=d.kod;
+                document.getElementById('kopyalaBtn').style.display='inline-block';
+            }
+        },2000);
+    } catch(err) {
+        alert('Bağlantı hatası: ' + err.message);
+        document.getElementById('sifreBtn').disabled=false;
+        document.getElementById('sifreBtn').innerText='🔑 8 Haneli Şifre Al';
+    }
 }
 
 function koduKopyala(){
@@ -259,6 +174,5 @@ function ekranaBas(){
     }).join('');
 }
 </script>
-
 </body>
 </html>
