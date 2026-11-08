@@ -16,7 +16,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-      - uses: android-actions/setup-android@v3
       - name: Telefon Ici Motoru Hazirla ve APK Derle
         run: |
           mkdir -p nodejs-project
