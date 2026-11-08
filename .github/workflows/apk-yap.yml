@@ -1,4 +1,4 @@
-name: Grupaj APK Olustur
+name: Grupaj Final APK
 on:
   push:
     branches: [ main, ana ]
@@ -16,19 +16,22 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-      - name: Bagimliliklari Kur ve Android Olustur
+      - uses: android-actions/setup-android@v3
+      - name: Telefon Ici Motoru Hazirla ve APK Derle
         run: |
+          mkdir -p nodejs-project
+          cp mobil-motor.js nodejs-project/main.js
+          cp package.json nodejs-project/package.json
+          cp -r www nodejs-project/www
           npm install
+          cd nodejs-project && npm install --omit=dev && cd ..
           npx cap add android
           npx cap sync android
-      - name: APK Derle
-        run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
-      - name: APK Dosyasini Yukle
+      - name: Final APK Yukle
         uses: actions/upload-artifact@v4
         with:
-          name: Grupaj-Uygulamasi
+          name: Grupaj-Tam-Bagimsiz-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
-
