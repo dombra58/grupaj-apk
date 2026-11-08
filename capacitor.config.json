@@ -1,5 +1,11 @@
 {
   "appId": "com.grupaj.canliradar.v2",
   "appName": "Grupaj",
-  "webDir": "www"
+  "webDir": "www",
+  "server": {
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true
+  }
 }
