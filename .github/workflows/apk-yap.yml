@@ -16,14 +16,9 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-      - name: Telefon Ici Motoru Hazirla ve APK Derle
+      - name: Android APK Derle
         run: |
-          mkdir -p nodejs-project
-          cp mobil-motor.js nodejs-project/main.js
-          cp package.json nodejs-project/package.json
-          cp -r www nodejs-project/www
           npm install
-          cd nodejs-project && npm install --omit=dev && cd ..
           npx cap add android
           npx cap sync android
           cd android
