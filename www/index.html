@@ -7,8 +7,9 @@
 <link href="https://googleapis.com" rel="stylesheet">
 <style>
 *{box-sizing:border-box}
-html,body{max-width:100%;overflow-x:hidden;background:#f4f7f6;color:#1e293b;font-family:'Inter',sans-serif;margin:0;padding:12px}
-.baslik-alani{text-align:center;margin-bottom:18px;padding-top:4px}
+html,body{max-width:100%;overflow-x:hidden;background:#f4f7f6;color:#1e293b;font-family:'Inter',sans-serif;margin:0;padding:12px;overscroll-behavior-y:contain}
+#yenileCubugu{text-align:center;font-size:13px;font-weight:700;color:#00a844;height:0;overflow:hidden;transition:height .2s}
+.baslik-alani{text-align:center;margin-bottom:16px;padding-top:4px}
 .baslik-ust{font-family:'Plus Jakarta Sans',sans-serif;color:#00a844;text-shadow:0 0 12px rgba(0,230,118,.45);font-size:30px;font-weight:800;letter-spacing:2px;line-height:1.1}
 .baslik-alt{font-family:'Plus Jakarta Sans',sans-serif;color:#0f172a;font-size:15px;font-weight:800;letter-spacing:1px;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px}
 .kamyon-sag{display:inline-block;transform:scaleX(-1)}
@@ -34,12 +35,12 @@ html,body{max-width:100%;overflow-x:hidden;background:#f4f7f6;color:#1e293b;font
 .liste-eleman:hover{background:#3b82f6;color:#fff}
 .ara-alani{text-align:center;margin-top:12px}
 .btn-ara-ana{background:#00c853;color:#fff;border:none;padding:10px 38px;border-radius:6px;font-size:15px;font-weight:700;cursor:pointer}
-#ilan-listesi{display:flex;flex-direction:column;gap:14px;max-width:750px;margin:0 auto;width:100%}
-.ilan-kart{background:#fff;border:2px solid #00e676;border-radius:14px;padding:14px;box-shadow:0 4px 12px rgba(0,230,118,.15);width:100%;max-width:100%;overflow:hidden}
-.ilan-ust{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px;border-bottom:1px solid #e2e8f0;padding-bottom:10px}
+#ilan-listesi{display:flex;flex-direction:column;gap:12px;max-width:750px;margin:0 auto;width:100%}
+.ilan-kart{background:#fff;border:2px solid #00e676;border-radius:14px;padding:14px;box-shadow:0 3px 10px rgba(0,230,118,.12);width:100%;max-width:100%;overflow:hidden}
+.ilan-ust{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:10px;border-bottom:1px solid #e2e8f0;padding-bottom:8px}
 .tip-rozet{background:#00e676;color:#002b11;padding:4px 10px;border-radius:6px;font-size:12.5px;font-weight:700;word-break:break-word}
 .tarih-saat{font-size:12px;color:#475569;font-weight:600;background:#f1f5f9;padding:4px 8px;border-radius:6px}
-.mesaj{font-size:15px;line-height:1.6;margin-bottom:14px;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+.mesaj{font-size:15px;line-height:1.55;margin-bottom:12px;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
 .kirmizi-dolgu{background:#ef4444;color:#fff;padding:1px 6px;border-radius:4px;font-weight:700}
 .aksiyon{display:flex;gap:8px;width:100%}
 .btn-ara,.btn-wp{flex:1;text-align:center;padding:10px 6px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13.5px;color:#fff;display:flex;align-items:center;justify-content:center}
@@ -47,6 +48,7 @@ html,body{max-width:100%;overflow-x:hidden;background:#f4f7f6;color:#1e293b;font
 </style>
 </head>
 <body>
+<div id="yenileCubugu">🔄 İlanlar yenileniyor...</div>
 <div class="baslik-alani">
     <div class="baslik-ust">GRUPAJ</div>
     <div class="baslik-alt"><span class="kamyon-sag">🚛</span> NAKLİYE RADARI <span>🚛</span></div>
@@ -83,9 +85,25 @@ html,body{max-width:100%;overflow-x:hidden;background:#f4f7f6;color:#1e293b;font
 </div>
 <script>
 const SUNUCU = 'http://169.40.43.91';
-let harita={},havuz=[],secili=[],aktif=[],ilanlar=[];
+let harita={},havuz=[],secili=[],aktif=[],ilanlar=[],sonOzet='';
 let kayitliTel=localStorage.getItem('grupaj_sofor_tel')||'',kontrolSayaci=null;
 const tr=s=>s.replace(/i/g,'İ').replace(/ı/g,'I').toUpperCase();
+
+let baslangicY = 0;
+document.addEventListener('touchstart', e => { if (window.scrollY === 0) baslangicY = e.touches.clientY; }, {passive:true});
+document.addEventListener('touchmove', e => {
+    if (baslangicY > 0 && window.scrollY === 0 && (e.touches.clientY - baslangicY) > 70) {
+        document.getElementById('yenileCubugu').style.height = '28px';
+    }
+}, {passive:true});
+document.addEventListener('touchend', async () => {
+    if (document.getElementById('yenileCubugu').style.height === '28px') {
+        sonOzet = '';
+        await cek();
+        setTimeout(() => { document.getElementById('yenileCubugu').style.height = '0'; }, 400);
+    }
+    baslangicY = 0;
+});
 
 fetch('/iller.json').then(r=>r.json()).then(res=>{
     res.data.forEach(il=>{
@@ -117,7 +135,7 @@ async function sifreIste(){
                 document.getElementById('sifreKodu').innerText=d.kod;
                 document.getElementById('kopyalaBtn').style.display='inline-block';
             }
-        },2000);
+        },2500);
     } catch(err) {
         alert('Bağlantı hatası: ' + err.message);
         document.getElementById('sifreBtn').disabled=false;
@@ -134,7 +152,7 @@ function radariAc(tel){
     kayitliTel=tel;
     document.getElementById('girisEkrani').style.display='none';
     document.getElementById('radarEkrani').style.display='block';
-    cek();setInterval(cek,2000);
+    cek();setInterval(cek,5000);
 }
 
 const inp=document.getElementById('aramaInput'),lst=document.getElementById('acilirListe');
@@ -155,13 +173,16 @@ function aramayiUygula(){
     let h=[];
     secili.forEach(s=>{h.push(s.ad.startsWith('İSTANBUL')?'İSTANBUL':s.ad);if(s.tur==='İl'&&harita[s.ad])h.push(...harita[s.ad]);});
     const yazilan=tr(inp.value.trim());if(yazilan.length>=2)h.push(yazilan);
-    aktif=[...new Set(h)].sort((a,b)=>b.length-a.length);ekranaBas();
+    aktif=[...new Set(h)].sort((a,b)=>b.length-a.length);sonOzet='';ekranaBas();
 }
 document.addEventListener('click',e=>{if(!e.target.closest('.kutu-dis'))lst.style.display='none';});
 async function cek(){if(!kayitliTel)return;try{ilanlar=await(await fetch(SUNUCU+'/api/ilanlar/'+kayitliTel)).json();ekranaBas();}catch(e){}}
 function ekranaBas(){
     const k=document.getElementById('ilan-listesi');
     const f=ilanlar.filter(i=>!aktif.length||aktif.some(x=>tr(i.mesaj||'').includes(x)));
+    const yeniOzet=f.length+'_'+(f?f.tarih:'')+'_'+aktif.join(',');
+    if(yeniOzet===sonOzet)return;
+    sonOzet=yeniOzet;
     if(!f.length){k.innerHTML='<div style="text-align:center;color:#64748b;margin-top:25px">Eşleşen ilan bulunamadı...</div>';return;}
     k.innerHTML=f.map(i=>{
         const tel=i.telefon?String(i.telefon).replace(/\D/g,''):'';
