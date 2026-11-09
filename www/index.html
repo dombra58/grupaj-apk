@@ -7,8 +7,8 @@
 <link href="https://googleapis.com" rel="stylesheet">
 <style>
 *{box-sizing:border-box}
-html,body{max-width:100%;overflow-x:hidden;background:#f4f7f6;color:#1e293b;font-family:'Inter',sans-serif;margin:0;padding:12px;overscroll-behavior-y:contain}
-#yenileCubugu{text-align:center;font-size:13px;font-weight:700;color:#00a844;height:0;overflow:hidden;transition:height .2s}
+body{background:#f4f7f6;color:#1e293b;font-family:'Inter',sans-serif;margin:0;padding:12px;width:100%;overflow-x:clip;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#yenileCubugu{text-align:center;font-size:13px;font-weight:700;color:#00a844;height:0;overflow:hidden;transition:height .2s;line-height:28px}
 .baslik-alani{text-align:center;margin-bottom:16px;padding-top:4px}
 .baslik-ust{font-family:'Plus Jakarta Sans',sans-serif;color:#00a844;text-shadow:0 0 12px rgba(0,230,118,.45);font-size:30px;font-weight:800;letter-spacing:2px;line-height:1.1}
 .baslik-alt{font-family:'Plus Jakarta Sans',sans-serif;color:#0f172a;font-size:15px;font-weight:800;letter-spacing:1px;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px}
@@ -24,26 +24,27 @@ html,body{max-width:100%;overflow-x:hidden;background:#f4f7f6;color:#1e293b;font
 .btn-kopyala{background:#0f172a;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer}
 .tarif-kutusu{text-align:left;margin-top:18px;padding:14px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;font-size:13.5px;line-height:1.6;color:#334155}
 #radarEkrani{display:none;width:100%}
-.kutu-dis{max-width:650px;margin:0 auto 18px;position:relative;width:100%}
+.kutu-dis{max-width:650px;margin:0 auto 16px;position:relative;width:100%}
 .etiket-baslik{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px}
-.etiketli-kutu{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 12px;min-height:48px;border:2px solid #00e676;border-radius:8px;background:#fff;box-shadow:0 0 10px rgba(0,230,118,.25);cursor:text;width:100%}
+.etiketli-kutu{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 12px;min-height:46px;border:2px solid #00e676;border-radius:8px;background:#fff;box-shadow:0 0 10px rgba(0,230,118,.25);cursor:text;width:100%}
 .secili-etiket{background:#f1f5f9;border:1px solid #cbd5e1;padding:4px 9px;border-radius:4px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:6px}
 .secili-etiket span{cursor:pointer;color:#ef4444;font-weight:900}
 .arama-input{border:none;outline:none;flex:1;min-width:120px;font-size:15px;background:transparent;padding:4px}
 .acilir-liste{position:absolute;left:0;right:0;background:#fff;border:1.5px solid #cbd5e1;border-top:none;max-height:220px;overflow-y:auto;z-index:9999;box-shadow:0 8px 20px rgba(0,0,0,.15);display:none}
 .liste-eleman{padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between}
 .liste-eleman:hover{background:#3b82f6;color:#fff}
-.ara-alani{text-align:center;margin-top:12px}
-.btn-ara-ana{background:#00c853;color:#fff;border:none;padding:10px 38px;border-radius:6px;font-size:15px;font-weight:700;cursor:pointer}
-#ilan-listesi{display:flex;flex-direction:column;gap:12px;max-width:750px;margin:0 auto;width:100%}
-.ilan-kart{background:#fff;border:2px solid #00e676;border-radius:14px;padding:14px;box-shadow:0 3px 10px rgba(0,230,118,.12);width:100%;max-width:100%;overflow:hidden}
-.ilan-ust{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:10px;border-bottom:1px solid #e2e8f0;padding-bottom:8px}
-.tip-rozet{background:#00e676;color:#002b11;padding:4px 10px;border-radius:6px;font-size:12.5px;font-weight:700;word-break:break-word}
-.tarih-saat{font-size:12px;color:#475569;font-weight:600;background:#f1f5f9;padding:4px 8px;border-radius:6px}
-.mesaj{font-size:15px;line-height:1.55;margin-bottom:12px;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
-.kirmizi-dolgu{background:#ef4444;color:#fff;padding:1px 6px;border-radius:4px;font-weight:700}
-.aksiyon{display:flex;gap:8px;width:100%}
-.btn-ara,.btn-wp{flex:1;text-align:center;padding:10px 6px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13.5px;color:#fff;display:flex;align-items:center;justify-content:center}
+.ara-alani{text-align:center;margin-top:10px}
+.btn-ara-ana{background:#00c853;color:#fff;border:none;padding:9px 34px;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer}
+#ilan-listesi{display:flex;flex-direction:column;gap:12px;max-width:750px;margin:0 auto;width:100%;padding-bottom:30px}
+.ilan-kart{background:#fff;border:2px solid #00e676;border-radius:14px;padding:13px;box-shadow:0 3px 10px rgba(0,230,118,.12);width:100%;overflow:hidden}
+.ilan-ust{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:10px;border-bottom:1px solid #e2e8f0;padding-bottom:8px}
+.tip-rozet{background:#00e676;color:#002b11;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;word-break:break-word}
+.tarih-saat{font-size:11.5px;color:#475569;font-weight:600;background:#f1f5f9;padding:3px 8px;border-radius:6px}
+.mesaj{font-size:14.5px;line-height:1.55;margin-bottom:10px;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+.mesaj a{color:#0284c7;font-weight:700;text-decoration:underline}
+.kirmizi-dolgu{background:#ef4444;color:#fff;padding:1px 5px;border-radius:4px;font-weight:700}
+.aksiyon{display:flex;gap:8px;width:100%;margin-top:6px}
+.btn-ara,.btn-wp{flex:1;text-align:center;padding:7px 6px;border-radius:7px;text-decoration:none;font-weight:700;font-size:12px;color:#fff;display:flex;align-items:center;justify-content:center;gap:4px}
 .btn-ara{background:#0284c7}.btn-wp{background:#00c853}
 </style>
 </head>
@@ -90,13 +91,13 @@ let kayitliTel=localStorage.getItem('grupaj_sofor_tel')||'',kontrolSayaci=null;
 const tr=s=>s.replace(/i/g,'İ').replace(/ı/g,'I').toUpperCase();
 
 let baslangicY = 0;
-document.addEventListener('touchstart', e => { if (window.scrollY === 0) baslangicY = e.touches.clientY; }, {passive:true});
-document.addEventListener('touchmove', e => {
-    if (baslangicY > 0 && window.scrollY === 0 && (e.touches.clientY - baslangicY) > 70) {
+window.addEventListener('touchstart', e => { if (window.scrollY <= 5) baslangicY = e.touches.clientY; }, {passive:true});
+window.addEventListener('touchmove', e => {
+    if (baslangicY > 0 && window.scrollY <= 5 && (e.touches.clientY - baslangicY) > 65) {
         document.getElementById('yenileCubugu').style.height = '28px';
     }
 }, {passive:true});
-document.addEventListener('touchend', async () => {
+window.addEventListener('touchend', async () => {
     if (document.getElementById('yenileCubugu').style.height === '28px') {
         sonOzet = '';
         await cek();
@@ -177,6 +178,7 @@ function aramayiUygula(){
 }
 document.addEventListener('click',e=>{if(!e.target.closest('.kutu-dis'))lst.style.display='none';});
 async function cek(){if(!kayitliTel)return;try{ilanlar=await(await fetch(SUNUCU+'/api/ilanlar/'+kayitliTel)).json();ekranaBas();}catch(e){}}
+function linkYap(metin){return metin.replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank">$1</a>');}
 function ekranaBas(){
     const k=document.getElementById('ilan-listesi');
     const f=ilanlar.filter(i=>!aktif.length||aktif.some(x=>tr(i.mesaj||'').includes(x)));
@@ -197,6 +199,7 @@ function ekranaBas(){
                 if(e){s+=`<span class="kirmizi-dolgu">${m.substr(idx,e.length)}</span>`;idx+=e.length;}else{s+=m[idx];idx++;}
             }m=s;
         }
+        m=linkYap(m);
         return `<div class="ilan-kart"><div class="ilan-ust"><span class="tip-rozet">${ik} ${i.tip} : ${i.kaynak}</span><span class="tarih-saat">📅 ${z}</span></div><div class="mesaj">${m}</div>${tel.length>=10?`<div class="aksiyon"><a href="tel:+${tel}" class="btn-ara">📞 Hemen Ara</a><a href="https://wa.me{tel}" target="_blank" class="btn-wp">💬 WhatsApp'tan Yaz</a></div>`:''}</div>`;
     }).join('');
 }
