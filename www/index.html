@@ -2,14 +2,17 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>GRUPAJ - Canlı Nakliye Radarı</title>
 <link href="https://googleapis.com" rel="stylesheet">
 <style>
 *{box-sizing:border-box}
-body{background:#f4f7f6;color:#1e293b;font-family:'Inter',sans-serif;margin:0;padding:16px}
-.baslik{font-family:'Plus Jakarta Sans',sans-serif;text-align:center;color:#00a844;text-shadow:0 0 12px rgba(0,230,118,.45);font-size:25px;font-weight:800;margin-bottom:18px}
-.giris-karti{max-width:460px;margin:20px auto;background:#fff;border:2px solid #00e676;border-radius:16px;padding:22px;box-shadow:0 6px 20px rgba(0,230,118,.2);text-align:center}
+html,body{max-width:100%;overflow-x:hidden;background:#f4f7f6;color:#1e293b;font-family:'Inter',sans-serif;margin:0;padding:12px}
+.baslik-alani{text-align:center;margin-bottom:18px;padding-top:4px}
+.baslik-ust{font-family:'Plus Jakarta Sans',sans-serif;color:#00a844;text-shadow:0 0 12px rgba(0,230,118,.45);font-size:30px;font-weight:800;letter-spacing:2px;line-height:1.1}
+.baslik-alt{font-family:'Plus Jakarta Sans',sans-serif;color:#0f172a;font-size:15px;font-weight:800;letter-spacing:1px;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px}
+.kamyon-sag{display:inline-block;transform:scaleX(-1)}
+.giris-karti{max-width:460px;margin:16px auto;background:#fff;border:2px solid #00e676;border-radius:16px;padding:20px;box-shadow:0 6px 20px rgba(0,230,118,.2);text-align:center}
 .giris-baslik{font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;color:#0f172a;margin-bottom:8px}
 .giris-alt{font-size:14px;color:#475569;margin-bottom:16px}
 .tel-input{width:100%;padding:13px;border:2px solid #cbd5e1;border-radius:10px;font-size:17px;font-weight:700;text-align:center;outline:none;margin-bottom:12px}
@@ -19,10 +22,10 @@ body{background:#f4f7f6;color:#1e293b;font-family:'Inter',sans-serif;margin:0;pa
 .sifre-kodu{font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;letter-spacing:4px;color:#008a38;margin:8px 0}
 .btn-kopyala{background:#0f172a;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer}
 .tarif-kutusu{text-align:left;margin-top:18px;padding:14px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;font-size:13.5px;line-height:1.6;color:#334155}
-#radarEkrani{display:none}
-.kutu-dis{max-width:650px;margin:0 auto 20px;position:relative}
+#radarEkrani{display:none;width:100%}
+.kutu-dis{max-width:650px;margin:0 auto 18px;position:relative;width:100%}
 .etiket-baslik{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px}
-.etiketli-kutu{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 12px;min-height:48px;border:2px solid #00e676;border-radius:8px;background:#fff;box-shadow:0 0 10px rgba(0,230,118,.25);cursor:text}
+.etiketli-kutu{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 12px;min-height:48px;border:2px solid #00e676;border-radius:8px;background:#fff;box-shadow:0 0 10px rgba(0,230,118,.25);cursor:text;width:100%}
 .secili-etiket{background:#f1f5f9;border:1px solid #cbd5e1;padding:4px 9px;border-radius:4px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:6px}
 .secili-etiket span{cursor:pointer;color:#ef4444;font-weight:900}
 .arama-input{border:none;outline:none;flex:1;min-width:120px;font-size:15px;background:transparent;padding:4px}
@@ -31,20 +34,23 @@ body{background:#f4f7f6;color:#1e293b;font-family:'Inter',sans-serif;margin:0;pa
 .liste-eleman:hover{background:#3b82f6;color:#fff}
 .ara-alani{text-align:center;margin-top:12px}
 .btn-ara-ana{background:#00c853;color:#fff;border:none;padding:10px 38px;border-radius:6px;font-size:15px;font-weight:700;cursor:pointer}
-#ilan-listesi{display:flex;flex-direction:column;gap:14px;max-width:750px;margin:0 auto}
-.ilan-kart{background:#fff;border:2px solid #00e676;border-radius:14px;padding:16px;box-shadow:0 4px 12px rgba(0,230,118,.15)}
+#ilan-listesi{display:flex;flex-direction:column;gap:14px;max-width:750px;margin:0 auto;width:100%}
+.ilan-kart{background:#fff;border:2px solid #00e676;border-radius:14px;padding:14px;box-shadow:0 4px 12px rgba(0,230,118,.15);width:100%;max-width:100%;overflow:hidden}
 .ilan-ust{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px;border-bottom:1px solid #e2e8f0;padding-bottom:10px}
-.tip-rozet{background:#00e676;color:#002b11;padding:4px 10px;border-radius:6px;font-size:12.5px;font-weight:700}
+.tip-rozet{background:#00e676;color:#002b11;padding:4px 10px;border-radius:6px;font-size:12.5px;font-weight:700;word-break:break-word}
 .tarih-saat{font-size:12px;color:#475569;font-weight:600;background:#f1f5f9;padding:4px 8px;border-radius:6px}
-.mesaj{font-size:15.5px;line-height:1.65;margin-bottom:14px;white-space:pre-line}
+.mesaj{font-size:15px;line-height:1.6;margin-bottom:14px;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
 .kirmizi-dolgu{background:#ef4444;color:#fff;padding:1px 6px;border-radius:4px;font-weight:700}
-.aksiyon{display:flex;gap:10px}
-.btn-ara,.btn-wp{flex:1;text-align:center;padding:10px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;color:#fff}
+.aksiyon{display:flex;gap:8px;width:100%}
+.btn-ara,.btn-wp{flex:1;text-align:center;padding:10px 6px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13.5px;color:#fff;display:flex;align-items:center;justify-content:center}
 .btn-ara{background:#0284c7}.btn-wp{background:#00c853}
 </style>
 </head>
 <body>
-<div class="baslik">🚛 GRUPAJ NAKLİYE RADARI</div>
+<div class="baslik-alani">
+    <div class="baslik-ust">GRUPAJ</div>
+    <div class="baslik-alt"><span class="kamyon-sag">🚛</span> NAKLİYE RADARI <span>🚛</span></div>
+</div>
 <div id="girisEkrani" class="giris-karti">
     <div class="giris-baslik">📱 WhatsApp Hesabını Bağla</div>
     <div class="giris-alt">Kendi gruplarındaki yükleri görmek için telefonunu bir kez bağla.</div>
