@@ -186,16 +186,20 @@ document.addEventListener('click',e=>{if(!e.target.closest('.kutu-dis'))lst.styl
 async function cek(){if(!kayitliTel)return;try{ilanlar=await(await fetch(SUNUCU+'/api/ilanlar/'+kayitliTel)).json();ekranaBas();}catch(e){}}
 function linkYap(metin){return metin.replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank">$1</a>');}
 function numaraCikar(hamTel, mesaj){
-    const birlesik = String(mesaj || '') + ' ' + String(hamTel || '');
-    const rakamlar = birlesik.replace(/[^0-9]/g, ' ').split(' ').filter(x => x.length >= 10);
-    for (let i = 0; i < rakamlar.length; i++) {
-        let r = rakamlar[i];
-        if (r.length === 12 && r.startsWith('905')) return r;
-        if (r.length === 11 && r.startsWith('05')) return '9' + r;
-        if (r.length === 10 && r.startsWith('5')) return '90' + r;
+    const rakamlar = (String(mesaj || '') + ' ' + String(hamTel || '')).replace(/[^0-9]/g, '');
+    let idx = 0;
+    while ((idx = rakamlar.indexOf('5', idx)) !== -1) {
+        if (idx >= 2 && rakamlar.substr(idx - 2, 2) === '90' && rakamlar.length >= idx + 10) {
+            return rakamlar.substr(idx - 2, 12);
+        }
+        if (rakamlar.length >= idx + 10) {
+            return '90' + rakamlar.substr(idx, 10);
+        }
+        idx++;
     }
     return '';
 }
+
 
 function ekranaBas(){
     const k=document.getElementById('ilan-listesi');
