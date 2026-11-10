@@ -9,11 +9,12 @@
 *{box-sizing:border-box}
 body{background:#f4f7f6;color:#1e293b;font-family:'Inter',sans-serif;margin:0;padding:12px;width:100%;overflow-x:clip;overflow-y:auto;-webkit-overflow-scrolling:touch}
 #yenileCubugu{text-align:center;font-size:13px;font-weight:700;color:#00a844;height:0;overflow:hidden;transition:height .2s;line-height:30px}
-.baslik-alani{text-align:center;margin-bottom:16px;padding-top:4px}
+.baslik-alani{text-align:center;margin-bottom:14px;padding-top:4px}
 .baslik-ust{font-family:'Plus Jakarta Sans',sans-serif;color:#00a844;text-shadow:0 0 12px rgba(0,230,118,.45);font-size:30px;font-weight:800;letter-spacing:2px;line-height:1.1}
 .baslik-alt{font-family:'Plus Jakarta Sans',sans-serif;color:#0f172a;font-size:15px;font-weight:800;letter-spacing:1px;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px}
+.baslik-aciklama{font-size:11.5px;color:#475569;font-weight:600;max-width:440px;margin:6px auto 0;line-height:1.4}
 .kamyon-sag{display:inline-block;transform:scaleX(-1)}
-.giris-karti{max-width:460px;margin:16px auto;background:#fff;border:2px solid #00e676;border-radius:16px;padding:20px;box-shadow:0 6px 20px rgba(0,230,118,.2);text-align:center}
+.giris-karti{max-width:460px;margin:14px auto;background:#fff;border:2px solid #00e676;border-radius:16px;padding:20px;box-shadow:0 6px 20px rgba(0,230,118,.2);text-align:center}
 .giris-baslik{font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;color:#0f172a;margin-bottom:8px}
 .giris-alt{font-size:14px;color:#475569;margin-bottom:16px}
 .tel-input{width:100%;padding:13px;border:2px solid #cbd5e1;border-radius:10px;font-size:17px;font-weight:700;text-align:center;outline:none;margin-bottom:12px}
@@ -53,6 +54,7 @@ body{background:#f4f7f6;color:#1e293b;font-family:'Inter',sans-serif;margin:0;pa
 <div class="baslik-alani">
     <div class="baslik-ust">GURUPAJ</div>
     <div class="baslik-alt"><span class="kamyon-sag">🚛</span> NAKLİYE RADARI <span>🚛</span></div>
+    <div class="baslik-aciklama">Bu Uygulama Bulunduğunuz WhatsApp Guruplarında, Kanallarda ve Kişilerinizin Paylaştığı Yük İlanlarını Görmenizi ve Arama Yapabilmenizi Sağlar.</div>
 </div>
 <div id="girisEkrani" class="giris-karti">
     <div class="giris-baslik">📱 WhatsApp Hesabını Bağla</div>
@@ -91,18 +93,16 @@ let kayitliTel=localStorage.getItem('grupaj_sofor_tel')||'',kontrolSayaci=null;
 const tr=s=>s.replace(/i/g,'İ').replace(/ı/g,'I').toUpperCase();
 
 let baslangicY = 0, cekildi = false;
-document.addEventListener('touchstart', e => {
-    const ustte = (document.documentElement.scrollTop || document.body.scrollTop || window.scrollY) <= 5;
-    if (ustte) baslangicY = e.touches.clientY;
+window.addEventListener('touchstart', e => {
+    if ((window.scrollY || document.documentElement.scrollTop || 0) <= 10) baslangicY = e.touches[0].clientY;
 }, {passive:true});
-document.addEventListener('touchmove', e => {
-    const ustte = (document.documentElement.scrollTop || document.body.scrollTop || window.scrollY) <= 5;
-    if (baslangicY > 0 && ustte && (e.touches.clientY - baslangicY) > 55) {
+window.addEventListener('touchmove', e => {
+    if (baslangicY > 0 && (e.touches[0].clientY - baslangicY) > 50 && (window.scrollY || document.documentElement.scrollTop || 0) <= 10) {
         cekildi = true;
         document.getElementById('yenileCubugu').style.height = '30px';
     }
 }, {passive:true});
-document.addEventListener('touchend', async () => {
+window.addEventListener('touchend', async () => {
     if (cekildi) {
         cekildi = false;
         sonOzet = '';
@@ -185,15 +185,24 @@ function aramayiUygula(){
 document.addEventListener('click',e=>{if(!e.target.closest('.kutu-dis'))lst.style.display='none';});
 async function cek(){if(!kayitliTel)return;try{ilanlar=await(await fetch(SUNUCU+'/api/ilanlar/'+kayitliTel)).json();ekranaBas();}catch(e){}}
 function linkYap(metin){return metin.replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank">$1</a>');}
+function numaraCikar(hamTel, mesaj){
+    const mTel = (mesaj||'').match(/(05\d{2}[\s.-]?\d{3}[\s.-]?\d{2}[\s.-]?\d{2}|5\d{2}[\s.-]?\d{3}[\s.-]?\d{2}[\s.-]?\d{2})/);
+    if(mTel) return '90' + mTel[0].replace(/\D/g,'').slice(-10);
+    const t = String(hamTel||'').replace(/\D/g,'');
+    if(t.length === 12 && t.startsWith('905')) return t;
+    if(t.length === 11 && t.startsWith('05')) return '9' + t;
+    if(t.length === 10 && t.startsWith('5')) return '90' + t;
+    return '';
+}
 function ekranaBas(){
     const k=document.getElementById('ilan-listesi');
     const f=ilanlar.filter(i=>!aktif.length||aktif.some(x=>tr(i.mesaj||'').includes(x)));
-    const yeniOzet=f.length+'_'+(f?f.tarih:'')+'_'+aktif.join(',');
+    const yeniOzet=f.length+'_'+(f[0]?f[0].tarih:'')+'_'+aktif.join(',');
     if(yeniOzet===sonOzet)return;
     sonOzet=yeniOzet;
     if(!f.length){k.innerHTML='<div style="text-align:center;color:#64748b;margin-top:25px">Eşleşen ilan bulunamadı...</div>';return;}
     k.innerHTML=f.map(i=>{
-        const tel=i.telefon?String(i.telefon).replace(/\D/g,''):'';
+        const tel=numaraCikar(i.telefon, i.mesaj);
         const d=i.tarih?new Date(i.tarih):new Date();
         const z=`${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
         const ik=i.tip==='Kanal'?'📢':(i.tip==='Durum'?'📱':'👥');
@@ -206,7 +215,7 @@ function ekranaBas(){
             }m=s;
         }
         m=linkYap(m);
-        return `<div class="ilan-kart"><div class="ilan-ust"><span class="tip-rozet">${ik} ${i.tip} : ${i.kaynak}</span><span class="tarih-saat">📅 ${z}</span></div><div class="mesaj">${m}</div>${tel.length>=10?`<div class="aksiyon"><a href="tel:+${tel}" class="btn-ara">📞 Hemen Ara</a><a href="https://wa.me{tel}" target="_blank" class="btn-wp">💬 WhatsApp'tan Yaz</a></div>`:''}</div>`;
+        return `<div class="ilan-kart"><div class="ilan-ust"><span class="tip-rozet">${ik} ${i.tip} : ${i.kaynak}</span><span class="tarih-saat">📅 ${z}</span></div><div class="mesaj">${m}</div>${tel?`<div class="aksiyon"><a href="tel:+${tel}" class="btn-ara">📞 Hemen Ara</a><a href="https://wa.me{tel}" target="_blank" class="btn-wp">💬 WhatsApp'tan Yaz</a></div>`:''}</div>`;
     }).join('');
 }
 </script>
