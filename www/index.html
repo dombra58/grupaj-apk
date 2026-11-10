@@ -186,14 +186,17 @@ document.addEventListener('click',e=>{if(!e.target.closest('.kutu-dis'))lst.styl
 async function cek(){if(!kayitliTel)return;try{ilanlar=await(await fetch(SUNUCU+'/api/ilanlar/'+kayitliTel)).json();ekranaBas();}catch(e){}}
 function linkYap(metin){return metin.replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank">$1</a>');}
 function numaraCikar(hamTel, mesaj){
-    const mTel = (mesaj||'').match(/(05\d{2}[\s.-]?\d{3}[\s.-]?\d{2}[\s.-]?\d{2}|5\d{2}[\s.-]?\d{3}[\s.-]?\d{2}[\s.-]?\d{2})/);
-    if(mTel) return '90' + mTel[0].replace(/\D/g,'').slice(-10);
-    const t = String(hamTel||'').replace(/\D/g,'');
-    if(t.length === 12 && t.startsWith('905')) return t;
-    if(t.length === 11 && t.startsWith('05')) return '9' + t;
-    if(t.length === 10 && t.startsWith('5')) return '90' + t;
+    const birlesik = String(mesaj || '') + ' ' + String(hamTel || '');
+    const rakamlar = birlesik.replace(/[^0-9]/g, ' ').split(' ').filter(x => x.length >= 10);
+    for (let i = 0; i < rakamlar.length; i++) {
+        let r = rakamlar[i];
+        if (r.length === 12 && r.startsWith('905')) return r;
+        if (r.length === 11 && r.startsWith('05')) return '9' + r;
+        if (r.length === 10 && r.startsWith('5')) return '90' + r;
+    }
     return '';
 }
+
 function ekranaBas(){
     const k=document.getElementById('ilan-listesi');
     const f=ilanlar.filter(i=>!aktif.length||aktif.some(x=>tr(i.mesaj||'').includes(x)));
