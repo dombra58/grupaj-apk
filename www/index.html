@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>GRUPAJ - Canlı Nakliye Radarı</title>
+<title>GURUPAJ - Canlı Nakliye Radarı</title>
 <link href="https://googleapis.com" rel="stylesheet">
 <style>
 *{box-sizing:border-box}
 body{background:#f4f7f6;color:#1e293b;font-family:'Inter',sans-serif;margin:0;padding:12px;width:100%;overflow-x:clip;overflow-y:auto;-webkit-overflow-scrolling:touch}
-#yenileCubugu{text-align:center;font-size:13px;font-weight:700;color:#00a844;height:0;overflow:hidden;transition:height .2s;line-height:28px}
+#yenileCubugu{text-align:center;font-size:13px;font-weight:700;color:#00a844;height:0;overflow:hidden;transition:height .2s;line-height:30px}
 .baslik-alani{text-align:center;margin-bottom:16px;padding-top:4px}
 .baslik-ust{font-family:'Plus Jakarta Sans',sans-serif;color:#00a844;text-shadow:0 0 12px rgba(0,230,118,.45);font-size:30px;font-weight:800;letter-spacing:2px;line-height:1.1}
 .baslik-alt{font-family:'Plus Jakarta Sans',sans-serif;color:#0f172a;font-size:15px;font-weight:800;letter-spacing:1px;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px}
@@ -51,7 +51,7 @@ body{background:#f4f7f6;color:#1e293b;font-family:'Inter',sans-serif;margin:0;pa
 <body>
 <div id="yenileCubugu">🔄 İlanlar yenileniyor...</div>
 <div class="baslik-alani">
-    <div class="baslik-ust">GRUPAJ</div>
+    <div class="baslik-ust">GURUPAJ</div>
     <div class="baslik-alt"><span class="kamyon-sag">🚛</span> NAKLİYE RADARI <span>🚛</span></div>
 </div>
 <div id="girisEkrani" class="giris-karti">
@@ -90,15 +90,21 @@ let harita={},havuz=[],secili=[],aktif=[],ilanlar=[],sonOzet='';
 let kayitliTel=localStorage.getItem('grupaj_sofor_tel')||'',kontrolSayaci=null;
 const tr=s=>s.replace(/i/g,'İ').replace(/ı/g,'I').toUpperCase();
 
-let baslangicY = 0;
-window.addEventListener('touchstart', e => { if (window.scrollY <= 5) baslangicY = e.touches.clientY; }, {passive:true});
-window.addEventListener('touchmove', e => {
-    if (baslangicY > 0 && window.scrollY <= 5 && (e.touches.clientY - baslangicY) > 65) {
-        document.getElementById('yenileCubugu').style.height = '28px';
+let baslangicY = 0, cekildi = false;
+document.addEventListener('touchstart', e => {
+    const ustte = (document.documentElement.scrollTop || document.body.scrollTop || window.scrollY) <= 5;
+    if (ustte) baslangicY = e.touches.clientY;
+}, {passive:true});
+document.addEventListener('touchmove', e => {
+    const ustte = (document.documentElement.scrollTop || document.body.scrollTop || window.scrollY) <= 5;
+    if (baslangicY > 0 && ustte && (e.touches.clientY - baslangicY) > 55) {
+        cekildi = true;
+        document.getElementById('yenileCubugu').style.height = '30px';
     }
 }, {passive:true});
-window.addEventListener('touchend', async () => {
-    if (document.getElementById('yenileCubugu').style.height === '28px') {
+document.addEventListener('touchend', async () => {
+    if (cekildi) {
+        cekildi = false;
         sonOzet = '';
         await cek();
         setTimeout(() => { document.getElementById('yenileCubugu').style.height = '0'; }, 400);
@@ -153,7 +159,7 @@ function radariAc(tel){
     kayitliTel=tel;
     document.getElementById('girisEkrani').style.display='none';
     document.getElementById('radarEkrani').style.display='block';
-    cek();setInterval(cek,5000);
+    cek();setInterval(cek,3000);
 }
 
 const inp=document.getElementById('aramaInput'),lst=document.getElementById('acilirListe');
